@@ -12,6 +12,5 @@ foreach ($file in ls (Join-Path (Get-Item $profile).Directory "Functions")) {
 }
 
 # Alias
-Remove-Item alias:curl # conflict with curl.exe
 Set-Alias -Name "Edit" -Value "notepad"
 
