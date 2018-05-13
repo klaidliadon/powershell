@@ -1,16 +1,15 @@
 # PSReadline Options
-if ($host.Name -eq 'ConsoleHost') { Import-Module "PSReadline" }
-Set-PSReadlineOption -EditMode "Emacs"
-Set-PSReadLineOption -HistoryNoDuplicates 
-Set-PSReadlineKeyHandler -Key "Tab" -Function "Complete"
-Set-PSReadlineKeyHandler -chord "ctrl+w" -function "BackwardKillWord"
-Set-PSReadlineKeyHandler -chord "ctrl+backspace" -function "BackwardKillLine"
+if ($host.Name -eq 'ConsoleHost') { 
+    Import-Module "PSReadline" 
+    Set-PSReadLineOption -HistoryNoDuplicates -HistorySaveStyle SaveIncrementally -EditMode Emacs
+    $bindings = @{"CTRL+w"="BackwardKillWord";"CTRL+Backspace"="BackwardKillLine";"Tab"="TabCompleteNext";"Shift+Tab"="TabCompletePrevious";}
+    $bindings.Keys | ForEach-Object {
+            Set-PSReadlineKeyHandler -chord $_ -function $bindings.Item($_) #
+    }
+}
 
 # Load every file in Functions
-foreach ($file in ls (Join-Path (Get-Item $profile).Directory "Functions")) {
-	. ($file| Select-Object FullName).FullName
-}
+$profile + "\..\Functions" | Get-ChildItem | ForEach-Object {. $_.FullName }
 
 # Alias
 Set-Alias -Name "Edit" -Value "notepad"
-

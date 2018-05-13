@@ -1,10 +1,9 @@
-function Go-Cd { 
+function Get-GoPackage { 
     $target = ($env:GOPATH + "\src\" + ${args}[0]).replace("/", "\")
-    if (![System.IO.Directory]::Exists($target)) {
-        Write-Host "Package " -NoNewline
-        Write-Host $args[0] -NoNewline -ForegroundColor Red
-        Write-Host " does not exits!"
-        return
+    if (!(Test-Path $target)) {
+        throw [System.Exception] ("Package "+${args}[0]+" not found")
     }
-    Set-Location $target
+    Push-Location $target
 }
+
+Set-Alias -Name "gocd" -Value "Get-GoPackage"
