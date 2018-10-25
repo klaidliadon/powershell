@@ -3,7 +3,7 @@ function Load-Environment($file) {
 		if (!$i) {
 			continue
 		}
-		$parts = $i.split("=")
+		$parts = $i.split("=",2)
         [Environment]::SetEnvironmentVariable($parts[0], $ExecutionContext.InvokeCommand.ExpandString($parts[1]), "Process")
 	}
 }
