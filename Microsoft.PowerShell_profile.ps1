@@ -1,15 +1,29 @@
-# PSReadline Options
-if ($host.Name -eq 'ConsoleHost') { 
-    Import-Module "PSReadline" 
-    Set-PSReadLineOption -HistoryNoDuplicates -HistorySaveStyle SaveIncrementally -EditMode Emacs
-    $bindings = @{"CTRL+w"="BackwardKillWord";"CTRL+Backspace"="BackwardKillLine";"Tab"="TabCompleteNext";"Shift+Tab"="TabCompletePrevious";}
-    $bindings.Keys | ForEach-Object {
-            Set-PSReadlineKeyHandler -chord $_ -function $bindings.Item($_) #
-    }
-}
+$env:LC_ALL='C.UTF-8'
+[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8
 
-# Load every file in Functions
-$profile + "\..\Functions" | Get-ChildItem | ForEach-Object {. $_.FullName }
+if ($host.Name -ne 'ConsoleHost') { return; }
+
+Import-Module psreadline
+Import-Module posh-git
+Import-Module oh-my-posh
+Import-Module terminal-icons
+
+. $PSScriptRoot\Functions.ps1
+
+Set-PSReadLineOption -HistoryNoDuplicates -HistorySaveStyle SaveIncrementally -EditMode Emacs -ExtraPromptLineCount 1
+@{
+	"CTRL+w"="BackwardKillWord";
+	"CTRL+Backspace"="BackwardKillLine";
+	"Tab"="TabCompleteNext";
+	"Shift+Tab"="TabCompletePrevious";
+}.GetEnumerator() | ForEach-Object { Set-PSReadlineKeyHandler -chord $_.Key -function $_.Value }
 
 # Alias
-Set-Alias -Name "Edit" -Value "notepad"
+@{
+	"cd"="Set-Location";
+	"edit"="notepad";
+	"export"="Export-Environment";
+	"gocd"="Get-GoPackage";
+	"open"="Invoke-Item";
+	"rm"="rm.exe";
+}.GetEnumerator() | ForEach-Object { Set-Alias -Option AllScope -Name $_.Key -Value $_.Value }
